@@ -1,0 +1,147 @@
+:root { --edit-bg: #ececec; }
+@media (prefers-color-scheme: dark) {
+  :root { --edit-bg: #262626; }
+}
+
+/* Lean source */
+pre.lean {
+  margin: 0;
+  font-size: 12.5px;
+  line-height: 1.65;
+  color: var(--ink-3);
+  min-width: max-content;
+}
+pre.lean .ln { display: block; padding: 0 10px; }
+pre.lean .ln.edit { background: var(--edit-bg); color: var(--ink); font-weight: 500; box-shadow: inset 2px 0 0 var(--ink); }
+pre.lean .ln.comment { color: var(--ink-3); }
+
+/* Task */
+.task-side { display: grid; gap: 12px; }
+
+/* Ruler heatmap */
+table.ruler { border-collapse: separate; border-spacing: 2px; font-size: 12px; width: 100%; min-width: 640px; }
+table.ruler th { font-weight: 400; color: var(--ink-3); white-space: nowrap; }
+table.ruler th.agent { font-weight: 400; color: var(--ink-2); text-align: center; padding-bottom: 2px; border-bottom: 1px solid var(--rule); }
+table.ruler th.mode { text-align: center; font-family: var(--mono); }
+table.ruler th.inst { text-align: left; font-family: var(--mono); padding-right: 10px; }
+table.ruler tr > th:first-child { position: sticky; left: 0; z-index: 1; background: var(--surface); }
+table.ruler th.track { text-align: left; padding: 10px 0 2px; color: var(--ink-3); font-weight: 400; }
+table.ruler td.cell {
+  height: 14px;
+  border-radius: 1px;
+  background: color-mix(in oklab, var(--seq-hi) var(--w, 0%), var(--seq-lo));
+  transition: background .25s ease;
+}
+table.ruler tr.total td {
+  font: 500 12px/1.3 var(--mono);
+  text-align: center;
+  padding: 4px 0 8px;
+}
+table.ruler tr.total th { font-weight: 500; color: var(--ink); text-align: left; }
+table.ruler tr.wall th.inst::after { content: " ✕"; color: var(--bad); }
+table.ruler tr.focus th.inst { color: var(--ink); font-weight: 500; }
+table.ruler tr.focus td.cell { box-shadow: 0 0 0 1px var(--ink); }
+table.ruler tr.dim th.inst { opacity: .55; }
+.ruler-cases { display: grid; gap: 10px; }
+.case-note { font-size: 14px; color: var(--ink-2); min-height: 4.8em; }
+.legend i.scale-ramp { display: inline-block; width: 72px; height: 8px; border-radius: 1px; background: linear-gradient(90deg, var(--seq-lo), var(--seq-hi)); vertical-align: -1px; margin: 0 6px; }
+
+/* Grader */
+.grader-layout { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 9fr); gap: 20px; }
+.grader-layout > * { min-width: 0; }
+.grader-list { display: grid; gap: 2px; align-content: start; }
+button.sub {
+  display: grid;
+  gap: 2px;
+  text-align: left;
+  font: 500 13px/1.4 var(--sans);
+  color: var(--ink-3);
+  background: transparent;
+  border: 0;
+  border-radius: 6px;
+  padding: 7px 10px;
+  cursor: pointer;
+}
+button.sub:hover { color: var(--ink); }
+button.sub[aria-pressed="true"] { background: var(--soft); color: var(--ink); }
+button.sub small { color: var(--ink-3); font-size: 11px; font-weight: 400; }
+.grader-main { display: grid; gap: 14px; align-content: start; }
+.grader-main pre.lean { min-height: 92px; padding: 10px 0; background: var(--soft); border-radius: 6px; color: var(--ink-2); }
+.grader-main .scroll-x { border-radius: 6px; background: var(--soft); }
+.gates { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
+.gate {
+  display: grid;
+  grid-template-columns: 22px 1fr;
+  gap: 2px 6px;
+  padding: 4px 0;
+  font-size: 13px;
+  color: var(--ink-3);
+}
+.gate small { grid-column: 2; font-size: 12px; }
+.gate .icon { font-family: var(--mono); font-weight: 500; }
+.gate.pass { color: var(--ink); }
+.gate.pass .icon { color: var(--good); }
+.gate.fail { color: var(--ink); }
+.gate.fail .icon { color: var(--bad); }
+.gate.revert { color: var(--ink); }
+.gate.revert .icon { color: var(--warn); }
+.grader-verdict { font: 500 13px/1.5 var(--mono); }
+.grader-verdict.ok { color: var(--good); }
+.grader-verdict.bad { color: var(--bad); }
+
+/* Munkres */
+.munkres-layout { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 24px; }
+.munkres-layout > * { min-width: 0; }
+.munkres-play, .munkres-trade { display: grid; gap: 14px; align-content: start; }
+table.cost { border-collapse: separate; border-spacing: 3px; }
+table.cost td {
+  width: 40px;
+  height: 36px;
+  text-align: center;
+  font: 500 13px var(--mono);
+  border-radius: 4px;
+  background: var(--soft);
+  color: var(--ink-2);
+}
+table.cost td.now { background: var(--accent); color: var(--accent-ink); }
+
+.delta-svg { display: block; width: 100%; min-width: 640px; }
+.pair-stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px 24px; }
+.pair-stats .stat { align-content: start; }
+.pair-stats .stat b { font-size: 17px; }
+
+/* Audit */
+.bytes { display: grid; grid-template-columns: repeat(16, minmax(28px, 1fr)); gap: 2px; min-width: 500px; }
+button.byte {
+  font: 10.5px/1.2 var(--mono);
+  padding: 5px 0;
+  border: 1px solid transparent;
+  border-radius: 2px;
+  cursor: pointer;
+  background: var(--surface);
+  color: var(--ink-3);
+  box-shadow: inset 0 0 0 1px var(--rule);
+}
+button.byte.reject { background: color-mix(in oklab, var(--ink-3) 30%, var(--surface)); color: var(--ink); box-shadow: none; }
+button.byte.conflict { background: var(--bad); color: var(--surface); font-weight: 600; box-shadow: none; }
+button.byte.fixed { background: var(--good); color: var(--surface); font-weight: 600; box-shadow: none; }
+button.byte:hover { border-color: var(--ink); }
+.key-reject { background: color-mix(in oklab, var(--ink-3) 30%, var(--surface)); }
+.key-free { background: var(--surface); box-shadow: inset 0 0 0 1px var(--rule); }
+.key-conflict { background: var(--bad); }
+.key-fixed { background: var(--good); }
+.audit-readout { font: 13px/1.5 var(--mono); min-height: 3em; }
+.evidence { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px 24px; }
+.evidence > div { display: grid; gap: 6px; align-content: start; min-width: 0; }
+.evidence h3, .defect-title { font-size: 14px; font-weight: 500; }
+.evidence .mono { font-size: 13px; color: var(--ink-2); }
+.defects { display: grid; gap: 6px; }
+.defect { display: grid; grid-template-columns: minmax(0, 17em) minmax(0, 1fr) 2em; gap: 10px; align-items: center; font-size: 13px; }
+.defect .track-bar { height: 6px; }
+.defect .fill { height: 100%; background: var(--accent); border-radius: 1px; min-width: 3px; }
+.defect .count { font-family: var(--mono); text-align: right; }
+
+@media (max-width: 640px) {
+  .grader-layout, .munkres-layout, .evidence, .pair-stats { grid-template-columns: minmax(0, 1fr); }
+  .defect { grid-template-columns: minmax(0, 9em) minmax(0, 1fr) 2.5em; font-size: 13px; }
+}

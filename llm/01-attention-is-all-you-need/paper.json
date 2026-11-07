@@ -1,0 +1,11 @@
+{
+  "issue": 1,
+  "title": "Attention Is All You Need",
+  "authors": "Vaswani et al.",
+  "year": 2017,
+  "venue": "NeurIPS",
+  "change": {
+    "en": "Drops recurrence and convolution and uses only attention. Any two words connect directly within one layer, and word order comes back through positional encoding.",
+    "zh": "去掉循环和卷积，只用注意力。一层之内任意两个词都直接相连，顺序信息改用位置编码加回去。"
+  }
+}

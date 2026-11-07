@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Frontier Research Storage</title>
+    <link rel="icon" href="data:," />
+    <script>
+      (function () {
+        var saved;
+        try { saved = localStorage.getItem("lang"); } catch (e) {}
+        document.documentElement.lang = saved || (navigator.language.toLowerCase().indexOf("zh") === 0 ? "zh" : "en");
+      })();
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500&family=Geist:wght@400;500;600&display=swap" />
+    <link rel="stylesheet" href="./shared/base.css" />
+    <style>
+      .hub-head { display: grid; gap: 12px; }
+      .hub-head h1 { font-size: clamp(28px, 5vw, 40px); font-weight: 600; letter-spacing: -.025em; }
+      #tracks { display: grid; gap: 48px; }
+      .track { display: grid; }
+      .track h2 { font: 13px/1.4 var(--mono); color: var(--ink-3); padding-bottom: 8px; }
+      .entry {
+        display: grid;
+        grid-template-columns: 32px minmax(0, 1fr) auto;
+        gap: 4px 8px;
+        padding: 16px 0;
+        border-top: 1px solid var(--rule);
+        text-decoration: none;
+      }
+      .entry .issue, .entry .year { font: 13px/1.7 var(--mono); color: var(--ink-3); }
+      .entry h3 { font-size: 17px; font-weight: 500; letter-spacing: -.01em; line-height: 1.4; }
+      .entry:hover h3 { text-decoration: underline; text-underline-offset: 3px; }
+      .entry .change { grid-column: 2 / -1; font-size: 15px; color: var(--ink-2); }
+    </style>
+  </head>
+  <body>
+    <main class="page">
+      <nav class="topbar">
+        <div class="lang" role="group" aria-label="Language / 语言">
+          <button type="button" data-set-lang="en">EN</button>
+          <button type="button" data-set-lang="zh">中文</button>
+        </div>
+      </nav>
+      <header class="hub-head">
+        <h1>Frontier Research Storage</h1>
+        <p class="lede" lang="en">One small interactive demo per paper, showing what the paper changed.</p>
+        <p class="lede" lang="zh">每篇论文一个可交互的小 demo，只展示这篇论文改变了什么。</p>
+      </header>
+      <div id="tracks"></div>
+    </main>
+    <script type="module" src="./hub.ts"></script>
+  </body>
+</html>

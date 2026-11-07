@@ -1,0 +1,259 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Attention Is All You Need</title>
+    <link rel="icon" href="data:," />
+    <script>
+      (function () {
+        var saved;
+        try { saved = localStorage.getItem("lang"); } catch (e) {}
+        document.documentElement.lang = saved || (navigator.language.toLowerCase().indexOf("zh") === 0 ? "zh" : "en");
+      })();
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500&family=Geist:wght@400;500;600&display=swap" />
+    <link rel="stylesheet" href="../../shared/base.css" />
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <main class="page">
+      <div class="top">
+        <nav class="topbar">
+          <a class="back" href="/"><span lang="en">← All papers</span><span lang="zh">← 全部论文</span></a>
+          <div class="lang" role="group" aria-label="Language / 语言">
+            <button type="button" data-set-lang="en">EN</button>
+            <button type="button" data-set-lang="zh">中文</button>
+          </div>
+        </nav>
+
+        <header class="paper-head">
+          <p class="eyebrow">LLM / 01 · NeurIPS 2017</p>
+          <h1>Attention Is All You Need</h1>
+          <p class="lede" lang="en">Translation models used to pass information step by step through RNNs or CNNs, with attention as a helper. This paper removes recurrence and convolution, leaving only attention.</p>
+          <p class="lede" lang="zh">之前的翻译模型靠 RNN 或 CNN 逐步传递信息，注意力只是辅助。这篇论文去掉循环和卷积，只留下注意力。</p>
+          <p class="paper-links">
+            <span>Vaswani, Shazeer, Parmar, Uszkoreit, Jones, Gomez, Kaiser, Polosukhin</span>
+            <a href="https://arxiv.org/abs/1706.03762" target="_blank" rel="noreferrer">arXiv:1706.03762</a>
+          </p>
+        </header>
+
+        <section class="abstract">
+          <p class="label" lang="en">Abstract</p>
+          <p class="label" lang="zh">摘要（译文）</p>
+          <p lang="en">The dominant sequence transduction models are based on complex recurrent or convolutional neural networks that include an encoder and a decoder. The best performing models also connect the encoder and decoder through an attention mechanism. We propose a new simple network architecture, the Transformer, based solely on attention mechanisms, dispensing with recurrence and convolutions entirely. Experiments on two machine translation tasks show these models to be superior in quality while being more parallelizable and requiring significantly less time to train. Our model achieves 28.4 BLEU on the WMT 2014 English-to-German translation task, improving over the existing best results, including ensembles, by over 2 BLEU. On the WMT 2014 English-to-French translation task, our model establishes a new single-model state-of-the-art BLEU score of 41.8 after training for 3.5 days on eight GPUs, a small fraction of the training costs of the best models from the literature. We show that the Transformer generalizes well to other tasks by applying it successfully to English constituency parsing both with large and limited training data.</p>
+          <p lang="zh">目前主流的序列转换模型都基于复杂的循环或卷积神经网络，包含一个编码器和一个解码器。表现最好的模型还通过注意力机制把编码器和解码器连接起来。我们提出一种新的简单网络架构 Transformer，它完全基于注意力机制，彻底摒弃了循环和卷积。在两个机器翻译任务上的实验表明，这类模型质量更高，同时更易并行，训练时间也大幅减少。我们的模型在 WMT 2014 英译德任务上达到 28.4 BLEU，比现有最好结果（包括 ensemble）高出 2 BLEU 以上。在 WMT 2014 英译法任务上，模型在 8 块 GPU 上训练 3.5 天后，创下 41.8 BLEU 的单模型新纪录，训练成本只是文献中最好模型的一小部分。我们还把 Transformer 成功用于英语成分句法分析，无论训练数据多还是少都表现良好，说明它能很好地推广到其他任务。</p>
+        </section>
+
+        <section class="abstract" aria-labelledby="patch-title">
+          <p class="label" id="patch-title"><span lang="en">What changed</span><span lang="zh">改了什么</span></p>
+          <div class="diff">
+            <a class="hunk" href="#flow"><span lang="en">01 How information flows</span><span lang="zh">01 信息怎么流动</span></a>
+            <div class="line del" lang="en"><span>Recurrent layers take O(n) sequential steps, and distant words are O(n) hops apart</span></div>
+            <div class="line add" lang="en"><span>Self-attention connects every position in O(1) sequential steps, with a maximum path of O(1)</span></div>
+            <div class="line del" lang="zh"><span>循环层：n 个词要走 O(n) 个顺序步，相距很远的两个词之间隔着 O(n) 跳</span></div>
+            <div class="line add" lang="zh"><span>自注意力：一层之内所有位置直接相连，O(1) 个顺序步，最长路径 O(1)</span></div>
+
+            <a class="hunk" href="#heads"><span lang="en">02 The role of attention</span><span lang="zh">02 注意力的角色</span></a>
+            <div class="line del" lang="en"><span>Attention works alongside a recurrent network and produces one distribution at a time</span></div>
+            <div class="line add" lang="en"><span>Attention is the whole model, with h = 8 heads running in parallel on different representation subspaces</span></div>
+            <div class="line del" lang="zh"><span>注意力配合循环网络使用，每次算出一种关注分布</span></div>
+            <div class="line add" lang="zh"><span>注意力就是主体：h = 8 个头在不同的表示子空间里并行计算</span></div>
+
+            <a class="hunk" href="#scale"><span lang="en">03 The scoring formula</span><span lang="zh">03 打分公式</span></a>
+            <div class="line del" lang="en"><span>Dot-product attention: q·k grows with d_k, pushing softmax into regions with tiny gradients</span></div>
+            <div class="line add" lang="en"><span>Scaled dot-product: q·k / √d_k</span></div>
+            <div class="line del" lang="zh"><span>点积注意力：d_k 变大后 q·k 也变大，softmax 进入梯度极小的区域</span></div>
+            <div class="line add" lang="zh"><span>缩放点积：q·k / √d_k</span></div>
+
+            <a class="hunk" href="#position"><span lang="en">04 Where word order comes from</span><span lang="zh">04 顺序信息从哪来</span></a>
+            <div class="line del" lang="en"><span>Order is implicit in the structure: recurrence steps through time, convolution slides a window</span></div>
+            <div class="line add" lang="en"><span>The structure carries no order, so sin/cos positional encodings are added to the embeddings</span></div>
+            <div class="line del" lang="zh"><span>顺序隐含在结构里：循环按时间步推进，卷积按窗口滑动</span></div>
+            <div class="line add" lang="zh"><span>结构不再带顺序，用 sin/cos 位置编码加到词向量上</span></div>
+
+            <a class="hunk" href="#results"><span lang="en">05 Results (WMT 2014, English to German)</span><span lang="zh">05 结果（WMT 2014 英译德）</span></a>
+            <div class="line del" lang="en"><span>Previous best: BLEU 26.36, ConvS2S Ensemble, 7.7·10¹⁹ FLOPs to train</span></div>
+            <div class="line add" lang="en"><span>Transformer: BLEU 28.4, single model, 2.3·10¹⁹ FLOPs to train</span></div>
+            <div class="line del" lang="zh"><span>此前最好：BLEU 26.36，ConvS2S Ensemble，训练 7.7·10¹⁹ FLOPs</span></div>
+            <div class="line add" lang="zh"><span>Transformer：BLEU 28.4，单模型，训练 2.3·10¹⁹ FLOPs</span></div>
+          </div>
+        </section>
+      </div>
+
+      <section class="demo" id="flow">
+        <p class="demo-tag">01</p>
+        <h2 lang="en">How many hops from the first word to the last?</h2>
+        <h2 lang="zh">从第一个词传到最后一个词，要隔多少跳？</h2>
+        <blockquote class="quote" lang="en">“a self-attention layer connects all positions with a constant number of sequentially executed operations, whereas a recurrent layer requires O(n) sequential operations.”<cite>Section 4</cite></blockquote>
+        <blockquote class="quote" lang="zh">“自注意力层用常数个顺序执行的操作连接所有位置，而循环层需要 O(n) 个顺序操作。”<cite>第 4 节（译文）</cite></blockquote>
+        <p class="demo-why" lang="en">Press play to run both at once, then click any word to see its path from the first word.</p>
+        <p class="demo-why" lang="zh">点“同时开跑”，再点任意一个词，看它和第一个词之间的路径。</p>
+        <div class="stage">
+          <div class="controls">
+            <button class="btn" id="flow-play" type="button"><span lang="en">▶ Run both</span><span lang="zh">▶ 同时开跑</span></button>
+            <label class="control" for="flow-n"><span lang="en">Length n =</span><span lang="zh">句长 n =</span> <b id="flow-n-value" class="mono"></b>
+              <input id="flow-n" type="range" min="5" max="21" value="12" />
+            </label>
+          </div>
+          <div class="flow-panels">
+            <div class="flow-panel">
+              <h3 lang="en">RNN: one word after another</h3>
+              <h3 lang="zh">RNN：一个词接一个词</h3>
+              <div class="scroll-x"><svg id="flow-rnn" class="flow-svg" viewBox="0 54 640 116" role="img" data-aria-en="An RNN processes words one at a time" data-aria-zh="RNN 按顺序逐个处理单词"></svg></div>
+              <div class="stats">
+                <div class="stat"><b id="flow-rnn-steps"></b><span lang="en">sequential steps</span><span lang="zh">已用顺序步</span></div>
+                <div class="stat"><b id="flow-rnn-path"></b><span lang="en">path to selected word</span><span lang="zh">到选中词的路径</span></div>
+              </div>
+            </div>
+            <div class="flow-panel">
+              <h3 lang="en">Self-attention: every position at once</h3>
+              <h3 lang="zh">自注意力：所有位置同时连接</h3>
+              <div class="scroll-x"><svg id="flow-sa" class="flow-svg" viewBox="0 0 640 170" role="img" data-aria-en="Self-attention connects all positions at once" data-aria-zh="自注意力一次连接所有位置"></svg></div>
+              <div class="stats">
+                <div class="stat"><b id="flow-sa-steps"></b><span lang="en">sequential steps</span><span lang="zh">已用顺序步</span></div>
+                <div class="stat"><b id="flow-sa-path"></b><span lang="en">path to selected word</span><span lang="zh">到选中词的路径</span></div>
+              </div>
+            </div>
+          </div>
+          <p class="note" lang="en">The sentence is the first sentence of the paper's abstract.</p>
+          <p class="note" lang="zh">句子取自论文摘要第一句。</p>
+        </div>
+
+        <div class="stage">
+          <div class="controls">
+            <span class="src" lang="en">Paper, Table 1</span>
+            <span class="src" lang="zh">论文 Table 1</span>
+            <span class="control"><span lang="en">Dimension d =</span><span lang="zh">维度 d =</span> <span id="flow-d"></span></span>
+          </div>
+          <div class="scroll-x"><table class="data" id="flow-table"></table></div>
+          <p class="note" lang="en">“Value” plugs n and d into the leading term for comparison, and isn't an operation count. Here k = 3 and r = 5. Set d to 16 to see the paper's condition: self-attention is only cheaper than a recurrent layer when n is smaller than d.</p>
+          <p class="note" lang="zh">“代入值”只把 n、d 代进复杂度主项来比大小，不是真实运算量。这里 k = 3，r = 5。把 d 调到 16 可以看到论文说的条件：只有 n 小于 d 时，自注意力才比循环层省。</p>
+        </div>
+      </section>
+
+      <section class="demo" id="heads">
+        <p class="demo-tag">02</p>
+        <h2 lang="en">Many heads, each tracking its own relation</h2>
+        <h2 lang="zh">多个头，各看各的关系</h2>
+        <blockquote class="quote" lang="en">“Multi-head attention allows the model to jointly attend to information from different representation subspaces at different positions. With a single attention head, averaging inhibits this.”<cite>Section 3.2.2</cite></blockquote>
+        <blockquote class="quote" lang="zh">“多头注意力让模型能够同时关注不同表示子空间、不同位置上的信息。只用单个注意力头时，平均操作会抑制这一点。”<cite>第 3.2.2 节（译文）</cite></blockquote>
+        <p class="demo-why" lang="en">Click a word, switch heads, then change the last word and watch where “it” points.</p>
+        <p class="demo-why" lang="zh">点一个词，切换不同的头，再换掉句尾的词，看 “it” 指向哪里。</p>
+        <div class="stage">
+          <span class="src toy" lang="en">Toy vectors: Q and K are set by hand, not trained. The formula is real.</span>
+          <span class="src toy" lang="zh">玩具向量：Q、K 是手工设定的，不是训练结果；公式是真的</span>
+          <div class="controls">
+            <div class="control"><span lang="en">Head</span><span lang="zh">头</span> <div id="heads-head"></div></div>
+            <div class="control"><span lang="en">Last word</span><span lang="zh">句尾</span> <div id="heads-end"></div></div>
+            <label class="control" for="heads-mask"><input id="heads-mask" type="checkbox" /> <span lang="en">Decoder mask (can't see later words)</span><span lang="zh">解码器掩码（不许看后面的词）</span></label>
+          </div>
+          <p class="heads-note" id="heads-note"></p>
+          <div class="heads-layout">
+            <div class="heads-sentence" id="heads-sentence"></div>
+            <div class="scroll-x"><table class="heat" id="heads-matrix"></table></div>
+          </div>
+          <p class="note" lang="en">Rows are queries, columns are the words attended to, and each row sums to 100%. softmax(QKᵀ/√d_k) runs live in your browser. The paper uses h = 8 and d_k = 64; three heads are shown here for clarity.</p>
+          <p class="note" lang="zh">行是查询词，列是被关注的词，每行加起来是 100%。softmax(QKᵀ/√d_k) 在浏览器里实时计算。论文用 h = 8、d_k = 64，这里为了看得清只放了 3 个头。</p>
+        </div>
+      </section>
+
+      <section class="demo" id="scale">
+        <p class="demo-tag">03</p>
+        <h2 lang="en">Why divide by √d_k</h2>
+        <h2 lang="zh">为什么要除以 √d_k</h2>
+        <blockquote class="quote" lang="en">“We suspect that for large values of d_k, the dot products grow large in magnitude, pushing the softmax function into regions where it has extremely small gradients.”<cite>Section 3.2.1</cite></blockquote>
+        <blockquote class="quote" lang="zh">“我们猜测，当 d_k 很大时，点积的数值会变得很大，把 softmax 函数推入梯度极小的区域。”<cite>第 3.2.1 节（译文）</cite></blockquote>
+        <p class="demo-why" lang="en">Drag the dimension and compare the two sides.</p>
+        <p class="demo-why" lang="zh">拖动维度，看两边的差别。</p>
+        <div class="stage">
+          <span class="src" lang="en">Live simulation: random vectors under the paper's footnote assumption</span>
+          <span class="src" lang="zh">实时模拟：按论文脚注的假设生成随机向量</span>
+          <div class="controls">
+            <label class="control" for="scale-d">d_k = <b id="scale-d-value" class="mono"></b>
+              <input id="scale-d" type="range" min="0" max="5" step="1" value="3" />
+            </label>
+            <button class="btn" id="scale-resample" type="button"><span lang="en">Resample</span><span lang="zh">重新采样</span></button>
+          </div>
+          <div class="scale-panels">
+            <div class="scale-panel">
+              <h3 lang="en">Unscaled softmax(q·k)</h3>
+              <h3 lang="zh">不缩放 softmax(q·k)</h3>
+              <div class="bars" id="scale-raw"></div>
+              <div class="stats">
+                <div class="stat"><b id="scale-raw-max"></b><span lang="en">largest weight</span><span lang="zh">最大权重</span></div>
+                <div class="stat"><b id="scale-raw-grad"></b><span lang="en">largest gradient p(1−p)</span><span lang="zh">最大梯度 p(1−p)</span></div>
+              </div>
+            </div>
+            <div class="scale-panel">
+              <h3 lang="en">Scaled softmax(q·k / √d_k)</h3>
+              <h3 lang="zh">缩放 softmax(q·k / √d_k)</h3>
+              <div class="bars" id="scale-scaled"></div>
+              <div class="stats">
+                <div class="stat"><b id="scale-scaled-max"></b><span lang="en">largest weight</span><span lang="zh">最大权重</span></div>
+                <div class="stat"><b id="scale-scaled-grad"></b><span lang="en">largest gradient p(1−p)</span><span lang="zh">最大梯度 p(1−p)</span></div>
+              </div>
+            </div>
+          </div>
+          <p class="note" id="scale-variance"></p>
+        </div>
+      </section>
+
+      <section class="demo" id="position">
+        <p class="demo-tag">04</p>
+        <h2 lang="en">Without recurrence, “dog bites man” and “man bites dog” look the same</h2>
+        <h2 lang="zh">没有循环之后，模型分不清 dog bites man 和 man bites dog</h2>
+        <blockquote class="quote" lang="en">“Since our model contains no recurrence and no convolution, in order for the model to make use of the order of the sequence, we must inject some information about the relative or absolute position of the tokens in the sequence.”<cite>Section 3.5</cite></blockquote>
+        <blockquote class="quote" lang="zh">“由于模型既没有循环也没有卷积，为了让模型利用序列的顺序，我们必须注入一些关于词元相对或绝对位置的信息。”<cite>第 3.5 节（译文）</cite></blockquote>
+        <p class="demo-why" lang="en">Each strip is a word's output vector after one self-attention layer. Check ‖Δ‖ with positional encoding off, then turn it on.</p>
+        <p class="demo-why" lang="zh">每条条纹是一个词经过一层自注意力后的输出向量。先在关闭位置编码时看 ‖Δ‖，再打开。</p>
+        <div class="stage">
+          <span class="src" lang="en">Real computation: random embeddings + one self-attention layer, no learned parameters</span>
+          <span class="src" lang="zh">真实运算：随机词向量 + 一层自注意力（无学习参数）</span>
+          <div class="controls">
+            <div class="control"><span lang="en">Right side</span><span lang="zh">右边语序</span> <div id="pos-order"></div></div>
+            <label class="control" for="pos-pe"><input id="pos-pe" type="checkbox" /> <span lang="en">Add positional encoding</span><span lang="zh">加上位置编码</span></label>
+          </div>
+          <div class="scroll-x"><table class="pos-table" id="pos-table"></table></div>
+          <p class="pos-verdict" id="pos-verdict"></p>
+        </div>
+        <div class="stage">
+          <span class="src" lang="en">Paper's formula: PE(pos, 2i) = sin(pos / 10000^(2i/d)), PE(pos, 2i+1) = cos(same)</span>
+          <span class="src" lang="zh">论文公式：PE(pos, 2i) = sin(pos / 10000^(2i/d))，PE(pos, 2i+1) = cos(同上)</span>
+          <div class="scroll-x"><canvas id="pos-canvas" class="pos-canvas" width="640" height="200" data-aria-en="Positional encoding heatmap, with dimensions on the x-axis and positions on the y-axis" data-aria-zh="位置编码热力图，横轴是向量维度，纵轴是位置"></canvas></div>
+          <p class="note" id="pos-readout"></p>
+        </div>
+      </section>
+
+      <section class="demo" id="results">
+        <p class="demo-tag">05</p>
+        <h2 lang="en">Higher scores at lower training cost</h2>
+        <h2 lang="zh">分数更高，训练成本还更低</h2>
+        <blockquote class="quote" lang="en">“Our model achieves 28.4 BLEU on the WMT 2014 English-to-German translation task, improving over the existing best results, including ensembles, by over 2 BLEU.”<cite>Abstract</cite></blockquote>
+        <blockquote class="quote" lang="zh">“我们的模型在 WMT 2014 英译德任务上达到 28.4 BLEU，比现有最好结果（包括 ensemble）高出 2 BLEU 以上。”<cite>摘要（译文）</cite></blockquote>
+        <div class="stage">
+          <span class="src" lang="en">Paper, Table 2 · EN-DE · newstest2014</span>
+          <span class="src" lang="zh">论文 Table 2 · EN-DE · newstest2014</span>
+          <div class="legend">
+            <span><i style="background: var(--ink-3)"></i><span lang="en">Earlier single model</span><span lang="zh">此前的单模型</span></span>
+            <span><i style="background: transparent; box-shadow: inset 0 0 0 2px var(--ink-3)"></i><span lang="en">Earlier ensemble</span><span lang="zh">此前的 Ensemble</span></span>
+            <span><i style="background: var(--accent)"></i>Transformer</span>
+          </div>
+          <div class="scroll-x"><svg id="results-chart" class="chart" viewBox="0 0 720 340" role="img" data-aria-en="Scatter plot of BLEU score against training cost for each model" data-aria-zh="各模型的 BLEU 分数与训练成本散点图"></svg></div>
+          <details>
+            <summary lang="en">Data table</summary>
+            <summary lang="zh">查看数据表</summary>
+            <div class="scroll-x"><table class="data" id="results-table"></table></div>
+          </details>
+          <p class="note" lang="en">ByteNet (23.75) has no cost figure in the table, so it isn't plotted. The Transformer cost is shared across EN-DE and EN-FR in the table. Training cost is the authors' estimate: hours × GPUs × GPU speed. The base model trained for 12 hours and the big model for 3.5 days, both on 8 P100 GPUs.</p>
+          <p class="note" lang="zh">ByteNet（23.75）在原表中没有成本数据，所以没有画。Transformer 的成本在原表中是 EN-DE 和 EN-FR 共用一格。训练成本是作者的估算：训练时间 × GPU 数 × 单 GPU 算力。基础版和大模型都用 8 块 P100，分别训练 12 小时和 3.5 天。</p>
+        </div>
+      </section>
+
+      <footer class="paper-foot" lang="en">Numbers marked “Paper” come from arXiv:1706.03762. Toy vectors only illustrate the mechanism.</footer>
+      <footer class="paper-foot" lang="zh">标为“论文”的数字都来自 arXiv:1706.03762 原文；玩具向量只用来说明机制。</footer>
+    </main>
+    <script type="module" src="./main.ts"></script>
+  </body>
+</html>

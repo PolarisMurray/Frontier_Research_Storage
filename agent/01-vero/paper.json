@@ -1,0 +1,11 @@
+{
+  "issue": 1,
+  "title": "Vero: Can AI Agents Build Formally Verified Software Repositories?",
+  "authors": "Ye et al.",
+  "year": 2026,
+  "venue": "arXiv",
+  "change": {
+    "en": "Moves the verified code generation test from single functions to whole repositories. The agent writes the implementation and proves every specification, and one missing proof means the repository isn't solved.",
+    "zh": "把验证代码生成的考题从单个函数扩大到整个仓库：agent 要自己写实现，再证明它满足全部规约，少一条都不算解出。"
+  }
+}

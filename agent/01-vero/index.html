@@ -1,0 +1,280 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Vero</title>
+    <link rel="icon" href="data:," />
+    <script>
+      (function () {
+        var saved;
+        try { saved = localStorage.getItem("lang"); } catch (e) {}
+        document.documentElement.lang = saved || (navigator.language.toLowerCase().indexOf("zh") === 0 ? "zh" : "en");
+      })();
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500&family=Geist:wght@400;500;600&display=swap" />
+    <link rel="stylesheet" href="../../shared/base.css" />
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <main class="page">
+      <div class="top">
+        <nav class="topbar">
+          <a class="back" href="/"><span lang="en">← All papers</span><span lang="zh">← 全部论文</span></a>
+          <div class="lang" role="group" aria-label="Language / 语言">
+            <button type="button" data-set-lang="en">EN</button>
+            <button type="button" data-set-lang="zh">中文</button>
+          </div>
+        </nav>
+
+        <header class="paper-head">
+          <p class="eyebrow">Agent / 01 · arXiv 2026</p>
+          <h1>Vero: Can AI Agents Build Formally Verified Software Repositories?</h1>
+          <p class="lede" lang="en">Earlier verified code generation benchmarks test single functions, or give the agent an implementation and ask only for proofs. Vero asks for both, across a whole repository.</p>
+          <p class="lede" lang="zh">之前的验证代码生成 benchmark 要么只考单个函数，要么实现已给定、只需补证明。Vero 要求 agent 在整个仓库上同时写实现和证明。</p>
+          <p class="paper-links">
+            <span>Ye, Lou, Sun, Song, Yan, Kasriel, Zhang, Yang, Kong, He, Song</span>
+            <a href="https://arxiv.org/abs/2608.13522" target="_blank" rel="noreferrer">arXiv:2608.13522</a>
+            <a href="https://github.com/sunblaze-ucb/vero" target="_blank" rel="noreferrer">GitHub</a>
+          </p>
+        </header>
+
+        <section class="abstract">
+          <p class="label" lang="en">Abstract</p>
+          <p class="label" lang="zh">摘要（译文）</p>
+          <p lang="en">AI agents are increasingly used for programming, but do not provide any guarantee on the correctness of generated code. Verified code generation, in which an agent produces both an implementation and a machine-checked proof of its specification, offers a stronger path toward trustworthy AI-generated software. Existing benchmarks in this direction either focus on individual functions or only evaluate proof generation with provided implementations. It is still an open question whether agents can make coherent implementation and proof choices across real multi-module codebases. To bridge this gap, we introduce Vero, the first benchmark to evaluate joint implementation and proof synthesis at the repository level. Vero contains 43 multi-module instances sourced from real-world repositories spanning Python, Dafny, Verus, and Coq, and covering diverse domains from cryptographic protocols to distributed systems. Each instance consists of a multi-module Lean 4 repository with predetermined API interfaces, manually curated formal specifications, and reference implementations, supporting both proof-only and code-and-proof evaluation modes. To improve benchmark reliability, Vero also includes an audit mechanism where agents are allowed to formally prove unsatisfiability of provided specification or incorrectness of reference code, which surfaces and corrects latent code and specification errors during curation. We evaluate frontier coding-agent configurations with Lean toolchain access. The strongest agent fully solves only 27 of 43 instances and closes no specifications on the hardest repositories. Vero provides a concrete testbed for measuring progress toward repository-scale verified software synthesis, where current agents still fall short. We release the benchmark, curation pipeline, and evaluation harness at https://github.com/sunblaze-ucb/vero.</p>
+          <p lang="zh">AI agent 越来越多地用于编程，但它们不保证生成代码的正确性。在验证代码生成中，agent 既产出实现，也产出对规约的机器检查证明，这为可信的 AI 生成软件提供了一条更可靠的路径。这个方向现有的 benchmark，要么只关注单个函数，要么只在给定实现上评测证明生成。agent 能否在真实的多模块代码库中做出协调一致的实现和证明选择，仍是一个未解的问题。为填补这一空白，我们提出 Vero，第一个在仓库层面评测实现与证明联合合成的 benchmark。Vero 包含 43 个多模块实例，来源于 Python、Dafny、Verus 和 Coq 的真实仓库，覆盖从密码协议到分布式系统的多个领域。每个实例都是一个多模块 Lean 4 仓库，带有预先确定的 API 接口、人工整理的形式化规约和参考实现，同时支持 proof-only 和 code-and-proof 两种评测模式。为提高 benchmark 的可靠性，Vero 还包含审计机制：agent 可以形式化地证明给定规约不可满足，或参考代码不正确，从而在整理阶段发现并修正潜在的代码和规约错误。我们评测了可使用 Lean 工具链的前沿 coding agent 配置。最强的 agent 也只完全解出 43 个实例中的 27 个，在最难的仓库上一条规约也没有证出。Vero 为衡量仓库级验证软件合成的进展提供了具体的测试平台，而目前的 agent 在这一任务上仍有不足。我们在 https://github.com/sunblaze-ucb/vero 发布了 benchmark、整理流水线和评测框架。</p>
+        </section>
+
+        <section class="abstract" aria-labelledby="patch-title">
+          <p class="label" id="patch-title"><span lang="en">What changed</span><span lang="zh">改了什么</span></p>
+          <div class="diff">
+            <a class="hunk" href="#task"><span lang="en">01 What gets tested</span><span lang="zh">01 考什么</span></a>
+            <div class="line del" lang="en"><span>Single functions (miniCodeProps, VERINA, CLEVER), or proofs only against a given implementation (RVBench, VeriSoftBench)</span></div>
+            <div class="line add" lang="en"><span>43 multi-module Lean 4 repositories, 743 APIs, 2,705 specifications; the agent writes implementation and proofs together</span></div>
+            <div class="line del" lang="zh"><span>单个函数（miniCodeProps、VERINA、CLEVER 等），或实现已给定、只补证明（RVBench、VeriSoftBench 等）</span></div>
+            <div class="line add" lang="zh"><span>43 个多模块 Lean 4 仓库，743 个 API，2,705 条规约；实现和证明由 agent 一起写</span></div>
+
+            <a class="hunk" href="#ruler"><span lang="en">02 What counts as solved</span><span lang="zh">02 怎么算解出</span></a>
+            <div class="line del" lang="en"><span>Specification coverage: the strongest configuration reaches 87.3% and looks nearly done</span></div>
+            <div class="line add" lang="en"><span>Full solve: every specification proved. The same results become 27 / 43, and 10 repositories resist every configuration</span></div>
+            <div class="line del" lang="zh"><span>规约覆盖率：最强配置 87.3%，看起来快做完了</span></div>
+            <div class="line add" lang="zh"><span>full solve：每条规约都证完才算。同一批结果变成 27 / 43，还有 10 个仓库没有任何配置能解出</span></div>
+
+            <a class="hunk" href="#grader"><span lang="en">03 How cheating is stopped</span><span lang="zh">03 怎么防作弊</span></a>
+            <div class="line del" lang="en"><span>“It compiles” can pass for “it's proved”: Lean accepts sorry and user-declared axioms</span></div>
+            <div class="line add" lang="en"><span>A three-layer grader: marked regions only, an axiom allowlist, and declaration screening</span></div>
+            <div class="line del" lang="zh"><span>“能编译”可能被当成“证明了”：Lean 接受 sorry 和用户自己声明的公理</span></div>
+            <div class="line add" lang="zh"><span>三层判分：只收标记区内的内容、公理白名单、声明筛查</span></div>
+
+            <a class="hunk" href="#freedom"><span lang="en">04 The role of the implementation</span><span lang="zh">04 实现的地位</span></a>
+            <div class="line del" lang="en"><span>The implementation is a fixed input, and the agent has to prove against it</span></div>
+            <div class="line add" lang="en"><span>The implementation is open: the agent can pick an easier-to-prove algorithm, or break the build and score 0</span></div>
+            <div class="line del" lang="zh"><span>实现是固定输入，只能对着它硬证</span></div>
+            <div class="line add" lang="zh"><span>实现可以改：agent 能换一个更好证明的算法，也可能因为实现写坏了而拿 0 分</span></div>
+
+            <a class="hunk" href="#audit"><span lang="en">05 When the test itself is wrong</span><span lang="zh">05 题目出错怎么办</span></a>
+            <div class="line del" lang="en"><span>A wrong specification also counts as an agent failure, with no way to tell them apart</span></div>
+            <div class="line add" lang="en"><span>Agents can submit machine-checked negative evidence. Screening found 38 specification defects, all fixed before evaluation</span></div>
+            <div class="line del" lang="zh"><span>规约写错了也算 agent 失败，无法区分</span></div>
+            <div class="line add" lang="zh"><span>agent 可以提交机器检查的反证。筛题时发现了 38 处规约缺陷，都在正式评测前修好了</span></div>
+          </div>
+        </section>
+      </div>
+
+      <section class="demo" id="task">
+        <p class="demo-tag">01</p>
+        <h2 lang="en">Which lines can the agent touch?</h2>
+        <h2 lang="zh">agent 能动哪几行代码？</h2>
+        <blockquote class="quote" lang="en">“Existing repository-scale benchmarks fix the implementation and evaluate proof generation in isolation, ignoring how implementation and proof choices interact in real verification work.”<cite>Section 3.2</cite></blockquote>
+        <blockquote class="quote" lang="zh">“现有的仓库级 benchmark 固定实现，孤立地评测证明生成，忽略了真实验证工作中实现选择与证明选择的相互影响。”<cite>第 3.2 节（译文）</cite></blockquote>
+        <p class="demo-why" lang="en">Switch between the three test formats. Highlighted lines are what the agent writes. A specification has type RepoImpl → Prop: it's defined over any implementation, which is what lets the agent write its own.</p>
+        <p class="demo-why" lang="zh">切换三种考法，高亮的是 agent 要写的部分。规约的类型是 RepoImpl → Prop：它针对任意实现定义，所以实现才可以交给 agent 来写。</p>
+        <div class="stage">
+          <div class="controls">
+            <div id="task-mode"></div>
+          </div>
+          <div class="scroll-x"><pre class="lean" id="task-code"></pre></div>
+          <div class="task-side">
+            <div class="stats" id="task-stats"></div>
+            <p class="note" id="task-note"></p>
+            <span class="src" id="task-src"></span>
+          </div>
+        </div>
+      </section>
+
+      <section class="demo" id="ruler">
+        <p class="demo-tag">02</p>
+        <h2 lang="en">Same results, different ruler</h2>
+        <h2 lang="zh">同一批结果，换一把尺子</h2>
+        <blockquote class="quote" lang="en">“We adopt full solve rather than partial specification coverage because partial coverage can be inflated by easy specifications, and in code-and-proof mode an unproven specification may indicate not merely a missing proof but an implementation that violates it, so only full coverage certifies the agent's code as correct.”<cite>Section 4.1</cite></blockquote>
+        <blockquote class="quote" lang="zh">“我们采用 full solve 而不是部分规约覆盖率，因为部分覆盖率可能被简单的规约抬高；而且在 code-and-proof 模式下，一条未证明的规约可能不只意味着缺一个证明，还可能意味着实现违反了它，所以只有完全覆盖才能确认 agent 的代码是正确的。”<cite>第 4.1 节（译文）</cite></blockquote>
+        <p class="demo-why" lang="en">Each row is a repository and each column a configuration (cp = code-and-proof, po = proof-only), 344 runs in all. Switch the ruler and watch the gradient turn black and white.</p>
+        <p class="demo-why" lang="zh">每一行是一个仓库，每一列是一种配置（cp = code-and-proof，po = proof-only），一共 344 次运行。切换尺子，颜色从渐变变成非黑即白。</p>
+        <div class="stage">
+          <span class="src" lang="en">Paper, Table 4 · per-repository data, totals match the text</span>
+          <span class="src" lang="zh">论文 Table 4 · 逐仓库数据，总数与正文一致</span>
+          <div class="controls">
+            <div class="control"><span lang="en">Ruler</span><span lang="zh">尺子</span> <div id="ruler-metric"></div></div>
+            <div class="control"><span lang="en">Sort</span><span lang="zh">排序</span> <div id="ruler-sort"></div></div>
+          </div>
+          <div class="scroll-x"><table class="ruler" id="ruler-table"></table></div>
+          <div class="legend" id="ruler-legend"></div>
+          <div class="ruler-cases">
+            <div class="control"><span lang="en">Notable repositories</span><span lang="zh">看几个典型仓库</span> <div id="ruler-case"></div></div>
+            <p class="case-note" id="ruler-case-note"></p>
+          </div>
+        </div>
+      </section>
+
+      <section class="demo" id="grader">
+        <p class="demo-tag">03</p>
+        <h2 lang="en">Send a submission through the grader</h2>
+        <h2 lang="zh">把一份提交送进判分器</h2>
+        <blockquote class="quote" lang="en">“To ensure the benchmark evaluates genuine verification work, the grader prevents both edits to benchmark content and proof-trivializing mechanisms.”<cite>Section 3.2</cite></blockquote>
+        <blockquote class="quote" lang="zh">“为确保 benchmark 评测的是真正的验证工作，判分器既阻止修改 benchmark 内容，也阻止让证明失去意义的手段。”<cite>第 3.2 节（译文）</cite></blockquote>
+        <p class="demo-why" lang="en">Pick a submission and see which gate stops it. Apart from the two marked illustrative, the code comes from the paper's Appendices D and G.</p>
+        <p class="demo-why" lang="zh">选一份提交，看它走到哪一关被拦下。除了标为示意的两份，代码都摘自论文 Appendix D 和 G。</p>
+        <div class="stage">
+          <div class="grader-layout">
+            <div class="grader-list" id="grader-list"></div>
+            <div class="grader-main">
+              <div class="scroll-x"><pre class="lean" id="grader-code"></pre></div>
+              <ol class="gates" id="grader-gates"></ol>
+              <p class="grader-verdict" id="grader-verdict"></p>
+              <p class="note" id="grader-note"></p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="demo" id="freedom">
+        <p class="demo-tag">04</p>
+        <h2 lang="en">The agent swapped the Hungarian algorithm for brute force</h2>
+        <h2 lang="zh">agent 把匈牙利算法换成了暴力枚举</h2>
+        <blockquote class="quote" lang="en">“Each substitution is behaviorally correct rather than a shortcut, so what the agent gains is provability and what it gives up is efficiency.”<cite>Section 4.2</cite></blockquote>
+        <blockquote class="quote" lang="zh">“每一次替换在行为上都是正确的，并不是走捷径，所以 agent 得到的是可证性，放弃的是效率。”<cite>第 4.2 节（译文）</cite></blockquote>
+        <p class="demo-why" lang="en">The munkres reference is a 409-line, six-state machine, and proving it optimal means maintaining loop invariants at every step. In code-and-proof mode, GPT-5.5 xhigh, GPT-5.5 medium and Opus 4.8 all did the same thing: write a 164-line enumeration that tries every permutation and keeps the cheapest.</p>
+        <p class="demo-why" lang="zh">munkres 的参考实现是 409 行的六状态机，要证明它最优，得在每一步维护循环不变量。GPT-5.5 xhigh、GPT-5.5 medium 和 Opus 4.8 在 code-and-proof 模式下都做了同一件事：写一个 164 行的枚举，遍历所有排列取代价最小的。</p>
+        <div class="stage">
+          <span class="src" lang="en">Runs live: the logic of the paper's bestPermFrom on a 4×4 example</span>
+          <span class="src" lang="zh">真实运行：论文中 bestPermFrom 的逻辑，在浏览器里跑一个 4×4 的例子</span>
+          <div class="munkres-layout">
+            <div class="munkres-play">
+              <table class="cost" id="munkres-matrix"></table>
+              <div class="stats">
+                <div class="stat"><b id="munkres-count"></b><span lang="en">permutations tried</span><span lang="zh">已枚举排列</span></div>
+                <div class="stat"><b id="munkres-now"></b><span lang="en">current cost</span><span lang="zh">当前代价</span></div>
+                <div class="stat"><b id="munkres-best"></b><span lang="en">lowest so far</span><span lang="zh">目前最小</span></div>
+              </div>
+              <div class="controls">
+                <button class="btn" id="munkres-play" type="button"><span lang="en">▶ Enumerate</span><span lang="zh">▶ 逐个枚举</span></button>
+                <button class="btn" id="munkres-new" type="button"><span lang="en">New matrix</span><span lang="zh">换一个矩阵</span></button>
+              </div>
+            </div>
+            <div class="munkres-trade">
+              <div class="scroll-x"><table class="data" id="munkres-compare"></table></div>
+              <label class="control" for="munkres-n"><span lang="en">Matrix size n =</span><span lang="zh">矩阵规模 n =</span> <b id="munkres-n-value" class="mono"></b>
+                <input id="munkres-n" type="range" min="3" max="15" value="10" />
+              </label>
+              <div class="stats">
+                <div class="stat"><b id="munkres-fact"></b><span lang="en">n! permutations to try</span><span lang="zh">枚举要试 n! 个排列</span></div>
+                <div class="stat"><b id="munkres-cube"></b><span lang="en">about n³ Hungarian steps</span><span lang="zh">匈牙利算法约 n³ 步</span></div>
+              </div>
+              <p class="note" lang="en">The submitted implementation is exponential and unusable in production. n³ is the standard Hungarian complexity, not a number from the paper.</p>
+              <p class="note" lang="zh">提交的实现是指数级的，生产环境不可用。n³ 是匈牙利算法的标准复杂度，不是论文里的数字。</p>
+            </div>
+          </div>
+        </div>
+
+        <p class="demo-why" lang="en">Freedom cuts both ways: an agent can write an implementation that's easier to prove, or break it. The chart shows each agent's difference between the two modes. Up means writing the implementation helped; down means it got in the way.</p>
+        <p class="demo-why" lang="zh">实现自由是双向的：能写出更好证明的实现，也可能写坏。下图是同一个 agent 在两种模式下的差值。向上表示写实现反而证出更多，向下表示写实现拖了后腿。</p>
+        <div class="stage">
+          <span class="src" lang="en">Calculated from the paper's Table 4: cp passed − po passed</span>
+          <span class="src" lang="zh">由论文 Table 4 计算：cp 通过数 − po 通过数</span>
+          <div class="controls">
+            <div class="control">Agent <div id="delta-agent"></div></div>
+            <div class="stat delta-total"><b id="delta-total"></b><span lang="en">net change, all repositories</span><span lang="zh">全部仓库净变化（规约数）</span></div>
+          </div>
+          <div class="legend">
+            <span><i style="background: var(--pos)"></i><span lang="en">cp proves more</span><span lang="zh">cp 证出更多</span></span>
+            <span><i style="background: var(--neg)"></i><span lang="en">po proves more</span><span lang="zh">po 证出更多</span></span>
+          </div>
+          <div class="scroll-x"><svg id="delta-chart" class="chart delta-svg" viewBox="0 0 900 380" role="img" data-aria-en="Difference in specifications passed between the two modes, per repository" data-aria-zh="每个仓库在两种模式下的通过数差值"></svg></div>
+          <p class="note" id="delta-note"></p>
+        </div>
+
+        <div class="stats pair-stats">
+          <div class="stat"><b>250 vs 201</b><span lang="en">Across the 5 algorithm substitutions, cp proves all 250 specifications and po proves 201</span><span lang="zh">5 个算法替换案例：cp 证完全部 250 条，po 只证出 201 条</span></div>
+          <div class="stat"><b>26 / 13 / 17 / 116</b><span lang="en">Of 172 repository-agent pairs: solved in both / cp only / po only / neither</span><span lang="zh">172 个仓库-agent 组合：两种模式都解 / 仅 cp / 仅 po / 都没解</span></div>
+          <div class="stat"><b lang="en">65 lines</b><b lang="zh">65 行</b><span lang="en">GPT-5.5 xhigh fixes its median implementation size by minute 30, then grows proofs from 883 to 1,077 lines</span><span lang="zh">GPT-5.5 xhigh 第 30 分钟就定下实现的中位行数；之后证明从 883 行涨到 1,077 行</span></div>
+        </div>
+        <p class="demo-why" lang="en">The paper's observation: agents “treat the implementation as fixed scaffolding rather than a lever”. When proofs get stuck, they keep grinding on the proofs instead of refactoring the code.</p>
+        <p class="demo-why" lang="zh">论文的观察：agent 把实现当成“固定的脚手架，而不是杠杆”。证明卡住时，它们继续磨证明，而不是回头重构代码。</p>
+      </section>
+
+      <section class="demo" id="audit">
+        <p class="demo-tag">05</p>
+        <h2 lang="en">The agent proved the task has no solution</h2>
+        <h2 lang="zh">agent 证明了：这道题没有解</h2>
+        <blockquote class="quote" lang="en">“Treating these silent failures as agent errors conflates benchmark defects with agent capability.”<cite>Section 3.5</cite></blockquote>
+        <blockquote class="quote" lang="zh">“把这些静默的失败算作 agent 的错误，会把 benchmark 的缺陷和 agent 的能力混为一谈。”<cite>第 3.5 节（译文）</cite></blockquote>
+        <p class="demo-why" lang="en">verdict has two specifications for the Base64 classifier charToBits, and both passed human review and type-checking. GPT-5.5 xhigh submitted a proof that they're jointly unsatisfiable: the character '=' (0x3D) falls in the range the second one rejects, while the first requires it to be padding.</p>
+        <p class="demo-why" lang="zh">verdict 里有两条关于 Base64 字符分类器 charToBits 的规约，都通过了人工审查和类型检查。GPT-5.5 xhigh 提交了一份联合不可满足的证明：字符 '='（0x3D）落在第二条要拒绝的区间里，但第一条要求它是 padding。</p>
+        <div class="stage">
+          <span class="src" lang="en">Paper, Appendix F · specifications verbatim; the grid is computed from them live</span>
+          <span class="src" lang="zh">论文 Appendix F · 规约原文；下面的格子由这两条规约实时算出</span>
+          <div class="scroll-x"><pre class="lean" id="audit-code"></pre></div>
+          <div class="controls">
+            <div class="control"><span lang="en">Version</span><span lang="zh">版本</span> <div id="audit-version"></div></div>
+          </div>
+          <div class="scroll-x"><div class="bytes" id="audit-bytes"></div></div>
+          <div class="legend">
+            <span><i class="key-reject"></i><span lang="en">reject: must return none</span><span lang="zh">reject：要求返回 none</span></span>
+            <span><i class="key-free"></i><span lang="en">unconstrained by these two</span><span lang="zh">不受这两条约束</span></span>
+            <span><i class="key-conflict"></i><span lang="en">conflict</span><span lang="zh">冲突</span></span>
+            <span><i class="key-fixed"></i><span lang="en">after the fix, padding only</span><span lang="zh">修复后只受 padding 约束</span></span>
+          </div>
+          <p class="audit-readout" id="audit-readout"></p>
+          <p class="note" lang="en">Bytes above 0x7F also satisfy c &gt; 0x7A and sit in the reject range. They aren't drawn here.</p>
+          <p class="note" lang="zh">0x7F 以上的字节都满足 c &gt; 0x7A，同样在 reject 区间内，这里没有画出。</p>
+        </div>
+
+        <div class="stage">
+          <span class="src" lang="en">Paper, Section 3.5 and Table 6</span>
+          <span class="src" lang="zh">论文第 3.5 节和 Table 6</span>
+          <div class="evidence">
+            <div>
+              <h3 lang="en">Reference fails a spec · disprove</h3><h3 lang="zh">参考实现不满足规约 · disprove</h3>
+              <p class="mono">¬⋀ S(canonical)</p>
+              <p class="note" lang="en">verified_bitmasks: 7 specifications lacked domain conditions and fell to counterexamples</p>
+              <p class="note" lang="zh">verified_bitmasks：7 条规约缺少定义域条件，被反例推翻</p>
+            </div>
+            <div>
+              <h3 lang="en">A spec has no solution · unsat</h3><h3 lang="zh">单条规约无解 · unsat</h3>
+              <p class="mono">¬∃ impl, S(impl)</p>
+              <p class="note" lang="en">verified_ironkv: an unconstrained comparator let a constructed malicious one refute 3 specifications</p>
+              <p class="note" lang="zh">verified_ironkv：比较器没有约束，3 条规约被构造出的恶意比较器证伪</p>
+            </div>
+            <div>
+              <h3 lang="en">Specs contradict · joint_unsat</h3><h3 lang="zh">几条规约互相矛盾 · joint_unsat</h3>
+              <p class="mono">¬∃ impl, ⋀ S(impl)</p>
+              <p class="note" lang="en">verdict: the example above. Each is satisfiable alone, but not together</p>
+              <p class="note" lang="zh">verdict：就是上面这个例子。每条单独都可满足，合起来不行</p>
+            </div>
+          </div>
+          <h3 class="defect-title" lang="en">The 38 defects</h3>
+          <h3 class="defect-title" lang="zh">38 处缺陷都是什么</h3>
+          <div class="defects" id="audit-defects"></div>
+          <p class="note" lang="en">The audit covered 9 repositories. Opus 4.8 found 33 defects and Codex found 30, with 25 in common. A human judged each against the upstream source, and all were fixed before the formal evaluation.</p>
+          <p class="note" lang="zh">审计覆盖 9 个仓库。Opus 4.8 找到 33 处，Codex 找到 30 处，两边重合 25 处。每一处都由人工对照上游源码裁定，修好之后才进入正式评测。</p>
+        </div>
+      </section>
+
+      <footer class="paper-foot" lang="en">Numbers and code marked “Paper” come from arXiv:2608.13522. Evaluated with Lean v4.29.1, a 90-minute budget per run, Codex v0.140.0 and Claude Code v2.1.191.</footer>
+      <footer class="paper-foot" lang="zh">标为“论文”的数字和代码都来自 arXiv:2608.13522 原文。评测用 Lean v4.29.1，每次运行预算 90 分钟，Codex v0.140.0，Claude Code v2.1.191。</footer>
+    </main>
+    <script type="module" src="./main.ts"></script>
+  </body>
+</html>
